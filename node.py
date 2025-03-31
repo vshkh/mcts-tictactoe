@@ -3,6 +3,7 @@ import random
 
 class Node:
     def __init__(self, board, parent=None, move=None, player='X'):
+        """Initializes a new node with the given board, parent, move, and player."""
         self.board = board              # A Board instance (game state)
         self.parent = parent            # Parent node
         self.children = []              # List of child nodes
@@ -22,12 +23,15 @@ class Node:
         return child_node
 
     def get_next_player(self):
+        """Returns the next player to move."""
         return 'O' if self.player == 'X' else 'X'
 
     def is_fully_expanded(self):
+        """Checks if all untried moves have been tried."""
         return len(self.untried_moves) == 0
 
     def best_child(self, c_param=1.41):
+        """Uses UCB to select the best child node (highest win rate, most balanced exploration and exploitation)"""
         return max(
             self.children,
             key=lambda child: (child.wins / child.visits if child.visits > 0 else float('inf')) +
