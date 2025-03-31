@@ -1,6 +1,31 @@
 from mcts import MCTS
 from board import Board
 
+def benchmark(ai1, ai2, games=50):
+    results = {'ai1_wins': 0, 'ai2_wins': 0, 'draws': 0}
+
+    for i in range(games):
+        board = Board()
+        current_player = 'X' if i % 2 == 0 else 'O'
+        players = {'X': ai1 if current_player == 'X' else ai2,
+                   'O': ai2 if current_player == 'X' else ai1}
+
+        while not board.is_game_over():
+            ai = players[current_player]
+            move = ai.search(board, current_player)
+            board.make_move(*move, current_player)
+            current_player = 'O' if current_player == 'X' else 'X'
+
+        winner = board.get_winner()
+        if winner == 'X':
+            results['ai1_wins' if players['X'] == ai1 else 'ai2_wins'] += 1
+        elif winner == 'O':
+            results['ai1_wins' if players['O'] == ai1 else 'ai2_wins'] += 1
+        else:
+            results['draws'] += 1
+
+    return results
+
 board = Board()
 mcts = MCTS(time_limit=1.0)
 current_player = 'X'

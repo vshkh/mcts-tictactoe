@@ -9,9 +9,19 @@ class MCTS:
         """Initializes the MCTS with a time limit for the search."""
         self.time_limit = time_limit  # Time to think (in seconds)
 
+    def train(self, board, player, iterations=1000):
+        """Trains the MCTS on the given board for the specified player."""
+        root = Node(board.clone(), player=player)
+        for _ in range(iterations):
+            node = self.selection(root)
+            node = self.expand(node)
+            result = self.simulate_random_playout(node.board.clone(), node.get_next_player())
+            self.backpropagate(node, result, player)
+        self.pre_trained_root = root
+
     def search(self, initial_board, player, turn=0):
         """Performs a Monte Carlo Tree Search on the given board for the specified player."""
-        root = Node(initial_board.clone(), player=player)
+        root = self.pre_trained_root if hasattr(self, 'pre_trained_root') else Node(initial_board.clone(), player=player)
         end_time = time.time() + self.time_limit
 
         # Within the time limit, perform the search:
